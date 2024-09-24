@@ -3,7 +3,7 @@ const saveItemBtns = document.querySelectorAll(".solid");
 const addItemContainers = document.querySelectorAll(".add-container");
 const addItems = document.querySelectorAll(".add-item");
 // Item Lists
-const itemLists = document.querySelectorAll(".drag-item-list");
+const listColumns = document.querySelectorAll(".drag-item-list");
 const backlogList = document.getElementById("backlog-list");
 const progressList = document.getElementById("progress-list");
 const completeList = document.getElementById("complete-list");
@@ -20,6 +20,8 @@ let onHoldListArray = [];
 let listArrays = [];
 
 // Drag Functionality
+let draggedItem;
+let currentColumn;
 
 // Get Arrays from localStorage if available, set default values if not
 function getSavedColumns() {
@@ -64,6 +66,8 @@ function createItemEl(columnEl, column, item, index) {
   const listEl = document.createElement("li");
   listEl.classList.add("drag-item");
   listEl.textContent = item;
+  listEl.draggable = true;
+  listEl.setAttribute("ondragstart", "drag(event)");
   // append
   columnEl.appendChild(listEl);
 }
@@ -96,6 +100,35 @@ function updateDOM() {
     createItemEl(onHoldList, 0, item, index);
   });
   // Run getSavedColumns only once, Update Local Storage
+}
+
+// when item starts dragging
+function drag(e) {
+  draggedItem = e.target;
+  console.log("draggedItem:", draggedItem);
+}
+
+// dropping item in colume
+function drop(e) {
+  e.preventDefault();
+  // remove background color/padding
+  listColumns.forEach((column) => {
+    column.classList.remove("over");
+  });
+  // add item to column
+  const parent = listColumns[currentColumn];
+  parent.appendChild(draggedItem);
+}
+
+// when item enters the columb area
+function dragEnter(column) {
+  listColumns[column].classList.add("over");
+  currentColumn = column;
+}
+
+// column allows for items to drop
+function allowDrop(e) {
+  e.preventDefault();
 }
 
 // onload
